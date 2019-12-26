@@ -3,8 +3,9 @@ from bs4 import BeautifulSoup
 
 with open('apts.txt', 'r') as reader:
 	for line in reader:
-		print(line, end='')
-		response = requests.get(line)
+		url = line.rstrip('\n')
+		response = requests.get(url)
+		print(response.request.url)
 		soup = BeautifulSoup(response.content, "html.parser")
 		myprice = soup.find("span", {"class": "price-tag-fraction"})
 		print(myprice)
