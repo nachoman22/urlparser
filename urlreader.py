@@ -1,14 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
+import logging
 
-with open('output.csv', 'w', newline='') as output:
-	writer = csv.writer(output)
+logging.basicConfig(filename='urlreader.log',level=logging.INFO)
+
+with open('report.csv', 'w', newline='') as report:
+	writer = csv.writer(report)
 	writer.writerow(["Link", "Price", "Address", "Surface", "Location"])
-
-with open('output.err', 'w', newline='') as errout:
-	writer = csv.writer(errout)
-	writer.writerow(["Missing values for the following links"])
 
 with open('apts.txt', 'r') as reader:
 	for line in reader:
@@ -21,12 +20,9 @@ with open('apts.txt', 'r') as reader:
 		mylocation = soup.find("h3", {"class": "map-location"})
 
 		if myprice != None and myaddress != None and mysurface != None and mylocation != None:
-			print("Data recorded for", url)
-			with open('output.csv', 'a', newline='') as output:
-				writer = csv.writer(output)
+			logging.info('Data recorded for: ' + url)
+			with open('report.csv', 'a', newline='') as report:
+				writer = csv.writer(report)
 				writer.writerow([url, myprice.text, myaddress.text, mysurface.text, mylocation.text])
 		else:
-			print("Missing value on the output for", url)
-			with open('output.err', 'a', newline='') as errout:
-				writer = csv.writer(errout)
-				writer.writerow([url])
+			logging.warning('Missing value on the report for: ' + url)
