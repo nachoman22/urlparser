@@ -2,11 +2,15 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 import logging
+# TODO: check maybe to import just the necessary methods/classes
+#    i.e.: from csv import writer as csv_writer
 
 logging.basicConfig(filename='urlreader.log', level=logging.INFO)
 
 # Open file and read urls into dictionary. File descriptor is closed
 # when out of the "with"
+## The file is not too big, read all to memory, there are other 
+## methods if it's required to keep pointer open.
 with open('apts.txt', 'r') as reader:
     url_list = reader.readlines()
 
@@ -16,6 +20,7 @@ csv_list = []
 for url_item in url_list:
     url = url_item.rstrip('\n')
     # Retrieve response from url and separate desired items
+    # TODO: would be nice to move this to a separated function/method
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
     myprice = soup.find("span", {"class": "price-tag-fraction"})
@@ -23,12 +28,17 @@ for url_item in url_list:
     mysurface = soup.find("dd", {"class": "align-surface"})
     mylocation = soup.find("h3", {"class": "map-location"})
 
+    # TODO: Simplify if or split in lines, modify != for is not
     if myprice != None and myaddress != None and mysurface != None and mylocation != None:
         logging.info('Data recorded for: ' + url)
         csv_list.append([url, myprice.text, myaddress.text, mysurface.text, mylocation.text])
     else:
+        # TODO: Verify if it's necesary to add the if logic or just 
+        #       add the None to the csv, it can be filtered later on 
+        #       with excel or any sheet tool.
         logging.warning('Missing value on the report for: ' + url)
 
+# TODO: Add logging maybe to the writing of the csv file.
 with open('report.csv', 'w', newline='') as report:
     writer = csv.writer(report)
     # Write header
