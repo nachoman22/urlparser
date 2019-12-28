@@ -1,9 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-import csv
+from csv import writer as csv_writer
 import logging
-# TODO: check maybe to import just the necessary methods/classes
-#    i.e.: from csv import writer as csv_writer
 
 logging.basicConfig(filename='urlreader.log', level=logging.INFO)
 
@@ -28,8 +26,7 @@ for url_item in url_list:
     mysurface = soup.find("dd", {"class": "align-surface"})
     mylocation = soup.find("h3", {"class": "map-location"})
 
-    # TODO: Simplify if or split in lines, modify != for is not
-    if myprice != None and myaddress != None and mysurface != None and mylocation != None:
+    if myprice is not None and myaddress is not None and mysurface is not None and mylocation is not None:
         logging.info('Data recorded for: ' + url)
         csv_list.append([url, myprice.text, myaddress.text, mysurface.text, mylocation.text])
     else:
@@ -40,10 +37,10 @@ for url_item in url_list:
 
 # TODO: Add logging maybe to the writing of the csv file.
 with open('report.csv', 'w', newline='') as report:
-    writer = csv.writer(report)
+    writer = csv_writer(report)
     # Write header
     writer.writerow(["Link", "Price", "Address", "Surface", "Location"])
     # Write rows from list
     for row in csv_list:
-        writer = csv.writer(report)
+        writer = csv_writer(report)
         writer.writerow(row)
